@@ -61,6 +61,7 @@ class Question {
         return userAnswer == isTrue;
       case QuestionType.fillBlank:
         final userStr = (userAnswer as String).trim().toLowerCase();
+        if (userStr.isEmpty) return false;
         final correctStr = answer!.trim().toLowerCase();
         return userStr == correctStr ||
             correctStr.contains(userStr) ||
