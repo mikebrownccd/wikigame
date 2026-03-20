@@ -37,9 +37,9 @@ class _QuizScreenState extends State<QuizScreen> {
                 onRetry: () => provider.startQuiz(widget.topic),
               );
             case QuizState.ready:
-              return _ReadyView(
+              return _LearnView(
                 topic: provider.session!.topic,
-                summary: provider.session!.topicSummary,
+                keyFacts: provider.session!.keyFacts,
                 questionCount: provider.session!.totalQuestions,
                 onStart: provider.beginAnswering,
               );
@@ -113,7 +113,7 @@ class _LoadingView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Fetching Wikipedia content\nand generating questions with AI...',
+            'Fetching Wikipedia article\nand generating questions...',
             style: TextStyle(color: Colors.white38, fontSize: 13),
             textAlign: TextAlign.center,
           ),
@@ -176,40 +176,68 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-class _ReadyView extends StatelessWidget {
+class _LearnView extends StatelessWidget {
   final String topic;
-  final String summary;
+  final List<String> keyFacts;
   final int questionCount;
   final VoidCallback onStart;
 
-  const _ReadyView({
+  const _LearnView({
     required this.topic,
-    required this.summary,
+    required this.keyFacts,
     required this.questionCount,
     required this.onStart,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
+    return SafeArea(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E2F38),
-              borderRadius: BorderRadius.circular(20),
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white54),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1CB0F6).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF1CB0F6).withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.quiz, size: 14, color: Color(0xFF1CB0F6)),
+                      const SizedBox(width: 5),
+                      Text(
+                        '$questionCount questions ahead',
+                        style: const TextStyle(color: Color(0xFF1CB0F6), fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ),
+
+          // Title
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
             child: Column(
               children: [
-                const Icon(
-                  Icons.menu_book_rounded,
-                  color: Color(0xFF58CC02),
-                  size: 48,
+                const Icon(Icons.menu_book_rounded, color: Color(0xFF58CC02), size: 40),
+                const SizedBox(height: 12),
+                const Text(
+                  'Learn first, then quiz',
+                  style: TextStyle(color: Colors.white54, fontSize: 13),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 4),
                 Text(
                   topic,
                   style: const TextStyle(
@@ -219,61 +247,100 @@ class _ReadyView extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  summary.length > 200
-                      ? '${summary.substring(0, 200)}...'
-                      : summary,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    height: 1.5,
+              ],
+            ),
+          ),
+
+          // Scrollable facts
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+              itemCount: keyFacts.length,
+              itemBuilder: (context, i) => _FactCard(
+                number: i + 1,
+                fact: keyFacts[i],
+              ),
+            ),
+          ),
+
+          // Start button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: onStart,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF58CC02),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      "I'm ready — Start Quiz",
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _InfoChip(
-                      icon: Icons.quiz,
-                      label: '$questionCount questions',
-                    ),
-                    const SizedBox(width: 12),
-                    const _InfoChip(
-                      icon: Icons.favorite,
-                      label: '3 lives',
-                    ),
-                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: onStart,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF58CC02),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+        ],
+      ),
+    );
+  }
+}
+
+class _FactCard extends StatelessWidget {
+  final int number;
+  final String fact;
+
+  const _FactCard({required this.number, required this.fact});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E2F38),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF2D4A5A)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: const BoxDecoration(
+              color: Color(0xFF58CC02),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                '$number',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
                 ),
-              ),
-              child: const Text(
-                'Start Quiz',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Choose different topic',
-              style: TextStyle(color: Colors.white54),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              fact,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.5,
+              ),
             ),
           ),
         ],

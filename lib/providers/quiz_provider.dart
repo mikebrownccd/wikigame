@@ -35,6 +35,7 @@ class QuizProvider extends ChangeNotifier {
       final article = await _wikipedia.getArticle(topic);
       final content = await _wikipedia.getFullContent(topic);
       final questions = _generator.generateQuestions(topic, content);
+      final keyFacts = _generator.extractKeyFacts(content);
 
       if (questions.isEmpty) {
         throw Exception('Could not generate questions for this article. Try a different topic.');
@@ -44,6 +45,7 @@ class QuizProvider extends ChangeNotifier {
         topic: article.title,
         topicSummary: article.summary,
         questions: questions,
+        keyFacts: keyFacts,
       );
       _state = QuizState.ready;
     } catch (e) {

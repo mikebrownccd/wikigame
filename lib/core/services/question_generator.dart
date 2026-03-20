@@ -17,6 +17,29 @@ class QuestionGenerator {
 
   static final _yearRegex = RegExp(r'\b(1[0-9]{3}|20[0-9]{2})\b');
 
+  List<String> extractKeyFacts(String content) {
+    final sentences = _extractSentences(content);
+    if (sentences.isEmpty) return [];
+
+    // Prefer sentences with dates/numbers (most factual), then proper nouns
+    final withDates = sentences
+        .where((s) => _yearRegex.hasMatch(s))
+        .take(3)
+        .toList();
+    final withNouns = sentences
+        .where((s) => !withDates.contains(s) && _properNounsIn(s).length >= 2)
+        .take(3)
+        .toList();
+    final others = sentences
+        .where((s) => !withDates.contains(s) && !withNouns.contains(s))
+        .take(3)
+        .toList();
+
+    final facts = [...withDates, ...withNouns, ...others].take(6).toList();
+    // Return in original article order
+    return sentences.where((s) => facts.contains(s)).take(6).toList();
+  }
+
   List<Question> generateQuestions(String topic, String content) {
     final sentences = _extractSentences(content);
     if (sentences.isEmpty) return [];

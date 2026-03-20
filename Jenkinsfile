@@ -59,7 +59,7 @@ pipeline {
                     flutter test integration_test || true
 
                     # Shut down emulator
-                    $ANDROID_HOME/platform-tools/adb emu kill
+                    $ANDROID_HOME/platform-tools/adb -s emulator-5554 emu kill || kill $EMULATOR_PID || true
                     wait $EMULATOR_PID || true
                 '''
             }

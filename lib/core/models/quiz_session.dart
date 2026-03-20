@@ -4,6 +4,7 @@ class QuizSession {
   final String topic;
   final String topicSummary;
   final List<Question> questions;
+  final List<String> keyFacts;
   final int currentIndex;
   final int lives;
   final int correctCount;
@@ -17,6 +18,7 @@ class QuizSession {
     required this.topic,
     required this.topicSummary,
     required this.questions,
+    this.keyFacts = const [],
     this.currentIndex = 0,
     this.lives = maxLives,
     this.correctCount = 0,
@@ -46,6 +48,7 @@ class QuizSession {
       topic: topic,
       topicSummary: topicSummary,
       questions: questions,
+      keyFacts: keyFacts,
       currentIndex: currentIndex + 1,
       lives: isCorrect ? lives : lives - 1,
       correctCount: isCorrect ? correctCount + 1 : correctCount,
