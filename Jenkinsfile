@@ -44,9 +44,15 @@ pipeline {
                     $ANDROID_HOME/emulator/emulator -avd $AVD_NAME -no-window -no-audio -no-snapshot &
                     EMULATOR_PID=$!
 
-                    # Wait for emulator to boot
+                    # Wait for emulator to fully boot (not just device-online)
                     $ANDROID_HOME/platform-tools/adb wait-for-device
-                    until $ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | grep -m 1 "1"; do
+                    echo "Waiting for full boot..."
+                    for i in $(seq 1 60); do
+                        BOOTED=$($ANDROID_HOME/platform-tools/adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+                        if [ "$BOOTED" = "1" ]; then
+                            echo "Emulator fully booted."
+                            break
+                        fi
                         sleep 5
                     done
 
@@ -55,8 +61,8 @@ pipeline {
                     $ANDROID_HOME/platform-tools/adb shell settings put global transition_animation_scale 0
                     $ANDROID_HOME/platform-tools/adb shell settings put global animator_duration_scale 0
 
-                    # Run integration tests
-                    flutter test integration_test || true
+                    # Run integration tests targeting the emulator explicitly
+                    flutter test integration_test/app_test.dart -d emulator-5554 || true
 
                     # Shut down emulator
                     $ANDROID_HOME/platform-tools/adb -s emulator-5554 emu kill || kill $EMULATOR_PID || true
