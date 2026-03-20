@@ -5,7 +5,7 @@ import '../models/question.dart';
 class ClaudeService {
   final String apiKey;
 
-  static const _apiUrl = 'https://api.anthropic.com/v1/messages';
+  static const _apiUrl = 'http://localhost:8081/v1/messages';
   static const _model = 'claude-opus-4-6';
 
   ClaudeService({required this.apiKey});

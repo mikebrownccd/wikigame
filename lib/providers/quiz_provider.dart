@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import '../core/models/quiz_session.dart';
 import '../core/services/wikipedia_service.dart';
-import '../core/services/claude_service.dart';
+import '../core/services/question_generator.dart';
 
 enum QuizState { idle, loading, ready, answering, complete, error }
 
 class QuizProvider extends ChangeNotifier {
   final WikipediaService _wikipedia;
-  final ClaudeService _claude;
+  final QuestionGenerator _generator;
 
   QuizState _state = QuizState.idle;
   QuizSession? _session;
@@ -15,11 +15,9 @@ class QuizProvider extends ChangeNotifier {
   bool _showingFeedback = false;
   bool? _lastAnswerCorrect;
 
-  QuizProvider({
-    required WikipediaService wikipedia,
-    required ClaudeService claude,
-  })  : _wikipedia = wikipedia,
-        _claude = claude;
+  QuizProvider({required WikipediaService wikipedia})
+      : _wikipedia = wikipedia,
+        _generator = QuestionGenerator();
 
   QuizState get state => _state;
   QuizSession? get session => _session;
@@ -36,7 +34,11 @@ class QuizProvider extends ChangeNotifier {
     try {
       final article = await _wikipedia.getArticle(topic);
       final content = await _wikipedia.getFullContent(topic);
-      final questions = await _claude.generateQuestions(topic, content);
+      final questions = _generator.generateQuestions(topic, content);
+
+      if (questions.isEmpty) {
+        throw Exception('Could not generate questions for this article. Try a different topic.');
+      }
 
       _session = QuizSession(
         topic: article.title,

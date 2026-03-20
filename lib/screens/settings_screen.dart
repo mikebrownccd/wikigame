@@ -28,11 +28,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _save() async {
-    await _storage.saveApiKey(_controller.text.trim());
-    setState(() => _saved = true);
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) setState(() => _saved = false);
-    });
+    try {
+      await _storage.saveApiKey(_controller.text.trim());
+      final verify = await _storage.loadApiKey();
+      // ignore: avoid_print
+      print('API key saved. Verified read-back: ${verify != null ? "OK (${verify.length} chars)" : "NULL"}');
+      setState(() => _saved = true);
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _saved = false);
+      });
+    } catch (e, stack) {
+      // ignore: avoid_print
+      print('Error saving API key: $e\n$stack');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save: $e'),
+            backgroundColor: const Color(0xFFFF4B4B),
+          ),
+        );
+      }
+    }
   }
 
   @override

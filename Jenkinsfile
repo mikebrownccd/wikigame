@@ -4,6 +4,7 @@ pipeline {
     environment {
         ANDROID_HOME = '/Users/michelle/Library/Android/sdk'
         AVD_NAME     = 'jenkins_avd'
+        PATH         = "/usr/local/bin:${env.PATH}"
     }
 
     stages {

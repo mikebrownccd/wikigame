@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'core/services/storage_service.dart';
 import 'providers/progress_provider.dart';
+import 'core/services/storage_service.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const WikiGameApp());
 }
 

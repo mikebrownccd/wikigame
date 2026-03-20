@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/services/wikipedia_service.dart';
-import '../core/services/storage_service.dart';
-import '../core/services/claude_service.dart';
 import '../providers/quiz_provider.dart';
 import 'quiz_screen.dart';
 
@@ -46,29 +44,9 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Future<void> _startQuiz(BuildContext context, String topic) async {
-    // Capture context-dependent objects before any async gap
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
-    final storage = StorageService();
-    final apiKey = await storage.loadApiKey();
-
-    if (!mounted) return;
-
-    if (apiKey == null || apiKey.isEmpty) {
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Please set your Anthropic API key in Settings first.'),
-          backgroundColor: Color(0xFFFF4B4B),
-        ),
-      );
-      return;
-    }
-
-    final quizProvider = QuizProvider(
-      wikipedia: _wikipedia,
-      claude: ClaudeService(apiKey: apiKey),
-    );
+    final quizProvider = QuizProvider(wikipedia: _wikipedia);
 
     await navigator.push(
       MaterialPageRoute(
