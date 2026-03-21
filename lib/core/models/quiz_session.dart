@@ -3,6 +3,7 @@ import 'question.dart';
 class QuizSession {
   final String topic;
   final String topicSummary;
+  final String? imageUrl;
   final List<Question> questions;
   final List<String> keyFacts;
   final int currentIndex;
@@ -17,6 +18,7 @@ class QuizSession {
   const QuizSession({
     required this.topic,
     required this.topicSummary,
+    this.imageUrl,
     required this.questions,
     this.keyFacts = const [],
     this.currentIndex = 0,
@@ -47,6 +49,7 @@ class QuizSession {
     return QuizSession(
       topic: topic,
       topicSummary: topicSummary,
+      imageUrl: imageUrl,
       questions: questions,
       keyFacts: keyFacts,
       currentIndex: currentIndex + 1,

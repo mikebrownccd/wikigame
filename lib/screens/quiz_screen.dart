@@ -232,12 +232,7 @@ class _LearnView extends StatelessWidget {
             child: Column(
               children: [
                 const Icon(Icons.menu_book_rounded, color: Color(0xFF58CC02), size: 40),
-                const SizedBox(height: 12),
-                const Text(
-                  'Learn first, then quiz',
-                  style: TextStyle(color: Colors.white54, fontSize: 13),
-                ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Text(
                   topic,
                   style: const TextStyle(
@@ -248,6 +243,15 @@ class _LearnView extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+            child: const Text(
+              'Learn first, then quiz',
+              style: TextStyle(color: Colors.white54, fontSize: 13),
+              textAlign: TextAlign.center,
             ),
           ),
 
@@ -473,6 +477,20 @@ class _QuestionView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (question.imageUrl != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.network(
+                  question.imageUrl!,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            ),
           _QuestionTypeLabel(type: question.type),
           const SizedBox(height: 16),
           Text(

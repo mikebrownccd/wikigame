@@ -1,0 +1,11 @@
+name: wikigame_proxy
+description: Local CORS proxy for Anthropic API
+publish_to: none
+
+environment:
+  sdk: ^3.11.3
+
+dependencies:
+  shelf: ^1.4.0
+  shelf_router: ^1.1.0
+  http: ^1.2.0

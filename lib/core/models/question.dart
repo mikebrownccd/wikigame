@@ -15,6 +15,9 @@ class Question {
   // Fill in the blank
   final String? answer;
 
+  // Per-question image
+  final String? imageUrl;
+
   const Question({
     required this.type,
     required this.question,
@@ -23,7 +26,21 @@ class Question {
     this.correctIndex,
     this.isTrue,
     this.answer,
+    this.imageUrl,
   });
+
+  Question copyWith({String? imageUrl}) {
+    return Question(
+      type: type,
+      question: question,
+      explanation: explanation,
+      options: options,
+      correctIndex: correctIndex,
+      isTrue: isTrue,
+      answer: answer,
+      imageUrl: imageUrl ?? this.imageUrl,
+    );
+  }
 
   factory Question.fromJson(Map<String, dynamic> json) {
     final typeStr = json['type'] as String;

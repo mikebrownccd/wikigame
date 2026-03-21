@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../core/models/quiz_session.dart';
+import '../core/models/question.dart';
 import '../core/services/wikipedia_service.dart';
 import '../core/services/question_generator.dart';
 
@@ -41,10 +42,20 @@ class QuizProvider extends ChangeNotifier {
         throw Exception('Could not generate questions for this article. Try a different topic.');
       }
 
+      final enriched = await Future.wait(
+        questions.map((q) async {
+          final term = _searchTermFor(q);
+          if (term == null) return q;
+          final url = await _wikipedia.getImageForTerm(term);
+          return url != null ? q.copyWith(imageUrl: url) : q;
+        }),
+      );
+
       _session = QuizSession(
         topic: article.title,
         topicSummary: article.summary,
-        questions: questions,
+        imageUrl: article.imageUrl,
+        questions: enriched,
         keyFacts: keyFacts,
       );
       _state = QuizState.ready;
@@ -81,6 +92,29 @@ class QuizProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  String? _searchTermFor(Question q) {
+    final numericOnly = RegExp(r'^\d+$');
+    switch (q.type) {
+      case QuestionType.fillBlank:
+        final a = q.answer ?? '';
+        return numericOnly.hasMatch(a) ? null : a;
+      case QuestionType.multipleChoice:
+        final correct = q.options?[q.correctIndex ?? 0] ?? '';
+        return numericOnly.hasMatch(correct) ? null : correct;
+      case QuestionType.trueFalse:
+        final words = q.question.split(RegExp(r'\s+'));
+        for (int i = 1; i < words.length; i++) {
+          final w = words[i].replaceAll(RegExp(r'[^a-zA-Z]'), '');
+          if (w.length > 2 &&
+              w[0] == w[0].toUpperCase() &&
+              w[0] != w[0].toLowerCase()) {
+            return w;
+          }
+        }
+        return null;
+    }
   }
 
   void reset() {

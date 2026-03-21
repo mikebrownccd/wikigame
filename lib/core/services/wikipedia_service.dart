@@ -72,6 +72,20 @@ class WikipediaService {
     );
   }
 
+  Future<String?> getImageForTerm(String term) async {
+    try {
+      final uri = Uri.parse(
+        '$_baseUrl/api/rest_v1/page/summary/${Uri.encodeComponent(term)}',
+      );
+      final response = await http.get(uri);
+      if (response.statusCode != 200) return null;
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return data['thumbnail']?['source'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<String> getFullContent(String title) async {
     final uri = Uri.parse(
       '$_baseUrl/w/api.php?action=query&titles=${Uri.encodeComponent(title)}&prop=extracts&explaintext=true&exsectionformat=plain&format=json&origin=*',
