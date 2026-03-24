@@ -112,7 +112,7 @@ Return ONLY valid JSON matching this exact structure — no markdown, no explana
 }
 
 Rules:
-- youtubeSearchQuery: 3-6 words that will find the best educational YouTube video on this topic (e.g. "Eiffel Tower history documentary", "World War 2 explained", "Leonardo da Vinci life art")
+- youtubeSearchQuery: 3-6 words targeting a short YouTube explainer video under 10 minutes (e.g. "Eiffel Tower explained", "World War 2 in 5 minutes", "Leonardo da Vinci who was he") — avoid the word "documentary"
 - keyFacts: exactly 3 short, punchy facts — one sentence each, under 20 words, most surprising or important facts from the article
 - questions: exactly 5 questions in the order shown above (2 MC, 2 T/F, 1 fill_blank)
 - All content must be grounded in the article — no invented facts
