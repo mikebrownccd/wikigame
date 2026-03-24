@@ -6,8 +6,13 @@ import '../models/question.dart';
 class LlmQuizResult {
   final List<Question> questions;
   final List<String> keyFacts;
+  final String? youtubeSearchQuery;
 
-  const LlmQuizResult({required this.questions, required this.keyFacts});
+  const LlmQuizResult({
+    required this.questions,
+    required this.keyFacts,
+    this.youtubeSearchQuery,
+  });
 }
 
 /// Calls the local Dart server's POST /api/questions endpoint, which in turn
@@ -75,7 +80,13 @@ class LlmQuestionService {
       throw LlmServiceException('Server returned an empty questions list');
     }
 
-    return LlmQuizResult(questions: questions, keyFacts: keyFacts);
+    final youtubeSearchQuery = body['youtubeSearchQuery'] as String?;
+
+    return LlmQuizResult(
+      questions: questions,
+      keyFacts: keyFacts,
+      youtubeSearchQuery: youtubeSearchQuery,
+    );
   }
 }
 

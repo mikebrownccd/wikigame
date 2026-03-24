@@ -69,6 +69,7 @@ $content
 
 Return ONLY valid JSON matching this exact structure — no markdown, no explanation:
 {
+  "youtubeSearchQuery": "topic keywords documentary",
   "keyFacts": [
     "Complete-sentence fact 1 from the article.",
     "Complete-sentence fact 2 from the article.",
@@ -114,6 +115,7 @@ Return ONLY valid JSON matching this exact structure — no markdown, no explana
 }
 
 Rules:
+- youtubeSearchQuery: 3-6 words that will find the best educational YouTube video on this topic (e.g. "Eiffel Tower history documentary", "World War 2 explained", "Leonardo da Vinci life art")
 - keyFacts: exactly 6 interesting, specific facts (complete sentences, no duplicates)
 - questions: exactly 5 questions in the order shown above (2 MC, 2 T/F, 1 fill_blank)
 - All content must be grounded in the article — no invented facts
@@ -131,6 +133,7 @@ Rules:
     if (questions is! List || questions.length < 1) {
       throw OllamaException('questions missing or empty in model response');
     }
+    // youtubeSearchQuery is optional — fall back gracefully if missing
   }
 }
 

@@ -31,6 +31,7 @@ http.Response _serverResponse(Map<String, dynamic> body, {int status = 200}) {
 }
 
 Map<String, dynamic> _validPayload() => {
+      'youtubeSearchQuery': 'Eiffel Tower history documentary',
       'keyFacts': [
         'The Eiffel Tower was completed in 1889.',
         'It was designed by Gustave Eiffel.',
@@ -140,6 +141,21 @@ void main() {
         for (final f in result.keyFacts) {
           expect(f, isNotEmpty);
         }
+      });
+
+      test('returns youtubeSearchQuery from response', () async {
+        final result = await service.generate('Eiffel Tower', 'content');
+        expect(result.youtubeSearchQuery, 'Eiffel Tower history documentary');
+      });
+
+      test('youtubeSearchQuery is null when server omits it', () async {
+        final payloadWithoutVideo = Map<String, dynamic>.from(_validPayload())
+          ..remove('youtubeSearchQuery');
+        final svc = LlmQuestionService(
+          client: _FakeClient((_) async => _serverResponse(payloadWithoutVideo)),
+        );
+        final result = await svc.generate('Topic', 'content');
+        expect(result.youtubeSearchQuery, isNull);
       });
 
       test('sends POST to /api/questions', () async {

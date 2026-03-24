@@ -35,6 +35,7 @@ http.Response _ollamaResponse(Map<String, dynamic> content) {
 
 // A valid quiz payload the model might return
 Map<String, dynamic> _validPayload() => {
+      'youtubeSearchQuery': 'Eiffel Tower history documentary',
       'keyFacts': [
         'The Eiffel Tower was built between 1887 and 1889.',
         'It was designed by Gustave Eiffel for the 1889 World\'s Fair.',
@@ -177,6 +178,22 @@ void main() {
             .firstWhere((q) => q['type'] == 'fill_blank');
         expect(fbq['answer'], isA<String>());
         expect((fbq['answer'] as String).isNotEmpty, isTrue);
+      });
+
+      test('returns youtubeSearchQuery when present', () async {
+        final result = await generator.generate('Eiffel Tower', 'content');
+        expect(result['youtubeSearchQuery'], 'Eiffel Tower history documentary');
+      });
+
+      test('succeeds without youtubeSearchQuery field', () async {
+        final payloadWithoutVideo = Map<String, dynamic>.from(_validPayload())
+          ..remove('youtubeSearchQuery');
+        final gen = OllamaQuestionGenerator(
+          client: _FakeClient((_) async => _ollamaResponse(payloadWithoutVideo)),
+        );
+        final result = await gen.generate('Eiffel Tower', 'content');
+        expect(result['youtubeSearchQuery'], isNull);
+        expect(result['questions'], isA<List>());
       });
 
       test('sends request to the configured baseUrl', () async {

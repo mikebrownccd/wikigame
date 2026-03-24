@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/quiz_provider.dart';
 import '../core/models/question.dart';
 import 'results_screen.dart';
@@ -41,6 +42,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 topic: provider.session!.topic,
                 keyFacts: provider.session!.keyFacts,
                 questionCount: provider.session!.totalQuestions,
+                youtubeSearchQuery: provider.session!.youtubeSearchQuery,
                 onStart: provider.beginAnswering,
               );
             case QuizState.answering:
@@ -180,12 +182,14 @@ class _LearnView extends StatelessWidget {
   final String topic;
   final List<String> keyFacts;
   final int questionCount;
+  final String? youtubeSearchQuery;
   final VoidCallback onStart;
 
   const _LearnView({
     required this.topic,
     required this.keyFacts,
     required this.questionCount,
+    this.youtubeSearchQuery,
     required this.onStart,
   });
 
@@ -255,6 +259,13 @@ class _LearnView extends StatelessWidget {
             ),
           ),
 
+          // YouTube video card
+          if (youtubeSearchQuery != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              child: _YoutubeCard(searchQuery: youtubeSearchQuery!),
+            ),
+
           // Scrollable facts
           Expanded(
             child: ListView.builder(
@@ -294,6 +305,71 @@ class _LearnView extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _YoutubeCard extends StatelessWidget {
+  final String searchQuery;
+  const _YoutubeCard({required this.searchQuery});
+
+  Future<void> _openYoutube() async {
+    final encoded = Uri.encodeComponent(searchQuery);
+    final uri = Uri.parse('https://www.youtube.com/results?search_query=$encoded');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _openYoutube,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E0000),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFFF0000).withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFF0000),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.play_arrow, color: Colors.white, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Watch a video',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    searchQuery,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.open_in_new, color: Colors.white38, size: 16),
+          ],
+        ),
       ),
     );
   }
