@@ -114,4 +114,12 @@ void main() async {
   print('  POST /api/questions  — Ollama question generation');
   print('  POST /v1/messages    — Anthropic CORS proxy');
   print('  GET  /health         — Health check');
+
+  // Pre-warm the model so the first user request is fast
+  print('Warming up Ollama model...');
+  generator.generate('warmup', 'warmup').then((_) {
+    print('Model ready.');
+  }).catchError((e) {
+    print('Warm-up skipped (Ollama may not be running): $e');
+  });
 }

@@ -38,7 +38,7 @@ class LlmQuestionService {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'topic': topic, 'content': content}),
           )
-          .timeout(const Duration(seconds: 60));
+          .timeout(const Duration(seconds: 180));
     } catch (e) {
       throw LlmServiceException('Could not reach question server: $e');
     }
