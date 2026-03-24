@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import '../core/models/quiz_session.dart';
 import '../core/models/question.dart';
 import '../core/services/wikipedia_service.dart';
@@ -100,6 +101,9 @@ class QuizProvider extends ChangeNotifier {
     _lastAnswerCorrect = isCorrect;
     _showingFeedback = true;
     _session = _session!.answerQuestion(isCorrect);
+    isCorrect
+        ? HapticFeedback.lightImpact()
+        : HapticFeedback.heavyImpact();
 
     notifyListeners();
   }

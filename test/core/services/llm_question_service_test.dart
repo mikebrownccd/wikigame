@@ -35,10 +35,7 @@ Map<String, dynamic> _validPayload() => {
       'keyFacts': [
         'The Eiffel Tower was completed in 1889.',
         'It was designed by Gustave Eiffel.',
-        'The tower stands 330 metres tall.',
-        'It attracted 7 million visitors per year.',
-        'It was originally planned to be demolished after 20 years.',
-        'It became a radio transmission tower, which saved it.',
+        'It attracts 7 million visitors per year.',
       ],
       'questions': [
         {
@@ -95,9 +92,9 @@ void main() {
         expect(result.questions.length, 5);
       });
 
-      test('returns 6 key facts', () async {
+      test('returns 3 key facts', () async {
         final result = await service.generate('Eiffel Tower', 'content');
-        expect(result.keyFacts.length, 6);
+        expect(result.keyFacts.length, 3);
       });
 
       test('parses multiple_choice question type', () async {

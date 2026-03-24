@@ -35,9 +35,9 @@ class QuestionGenerator {
         .take(3)
         .toList();
 
-    final facts = [...withDates, ...withNouns, ...others].take(6).toList();
+    final facts = [...withDates, ...withNouns, ...others].take(3).toList();
     // Return in original article order
-    return sentences.where((s) => facts.contains(s)).take(6).toList();
+    return sentences.where((s) => facts.contains(s)).take(3).toList();
   }
 
   List<Question> generateQuestions(String topic, String content) {

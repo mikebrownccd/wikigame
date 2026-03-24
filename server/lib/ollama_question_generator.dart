@@ -71,12 +71,9 @@ Return ONLY valid JSON matching this exact structure — no markdown, no explana
 {
   "youtubeSearchQuery": "topic keywords documentary",
   "keyFacts": [
-    "Complete-sentence fact 1 from the article.",
-    "Complete-sentence fact 2 from the article.",
-    "Complete-sentence fact 3 from the article.",
-    "Complete-sentence fact 4 from the article.",
-    "Complete-sentence fact 5 from the article.",
-    "Complete-sentence fact 6 from the article."
+    "Short, punchy fact 1.",
+    "Short, punchy fact 2.",
+    "Short, punchy fact 3."
   ],
   "questions": [
     {
@@ -116,7 +113,7 @@ Return ONLY valid JSON matching this exact structure — no markdown, no explana
 
 Rules:
 - youtubeSearchQuery: 3-6 words that will find the best educational YouTube video on this topic (e.g. "Eiffel Tower history documentary", "World War 2 explained", "Leonardo da Vinci life art")
-- keyFacts: exactly 6 interesting, specific facts (complete sentences, no duplicates)
+- keyFacts: exactly 3 short, punchy facts — one sentence each, under 20 words, most surprising or important facts from the article
 - questions: exactly 5 questions in the order shown above (2 MC, 2 T/F, 1 fill_blank)
 - All content must be grounded in the article — no invented facts
 - Multiple-choice options must be plausible distractors, not obviously wrong

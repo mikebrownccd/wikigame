@@ -39,10 +39,7 @@ Map<String, dynamic> _validPayload() => {
       'keyFacts': [
         'The Eiffel Tower was built between 1887 and 1889.',
         'It was designed by Gustave Eiffel for the 1889 World\'s Fair.',
-        'The tower stands 330 metres tall including its antenna.',
-        'It was the world\'s tallest man-made structure for 41 years.',
         'About 7 million people visit the Eiffel Tower every year.',
-        'The tower was originally intended to be dismantled after 20 years.',
       ],
       'questions': [
         {
@@ -111,10 +108,10 @@ void main() {
         expect(prompt, contains('fill_blank'));
       });
 
-      test('asks for exactly 5 questions and 6 key facts', () {
+      test('asks for exactly 5 questions and 3 key facts', () {
         final prompt = generator.buildPrompt('Topic', 'content');
         expect(prompt, contains('5 questions'));
-        expect(prompt, contains('6 interesting'));
+        expect(prompt, contains('exactly 3'));
       });
 
       test('uses snake_case JSON field names', () {
@@ -140,7 +137,7 @@ void main() {
       test('returns keyFacts list', () async {
         final result = await generator.generate('Eiffel Tower', 'content');
         expect(result['keyFacts'], isA<List>());
-        expect((result['keyFacts'] as List).length, 6);
+        expect((result['keyFacts'] as List).length, 3);
       });
 
       test('returns questions list', () async {

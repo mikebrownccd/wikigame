@@ -22,10 +22,10 @@ void main() {
   setUp(() => generator = QuestionGenerator());
 
   group('extractKeyFacts', () {
-    test('returns up to 6 facts for rich content', () {
+    test('returns up to 3 facts for rich content', () {
       final facts = generator.extractKeyFacts(_richContent);
       expect(facts.length, greaterThan(0));
-      expect(facts.length, lessThanOrEqualTo(6));
+      expect(facts.length, lessThanOrEqualTo(3));
     });
 
     test('returns empty list for empty content', () {

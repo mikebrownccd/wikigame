@@ -467,19 +467,37 @@ class _QuizView extends StatelessWidget {
         children: [
           _QuizHeader(session: session, onQuit: () => Navigator.pop(context)),
           Expanded(
-            child: provider.showingFeedback
-                ? _FeedbackView(
-                    isCorrect: provider.lastAnswerCorrect!,
-                    explanation: session.currentQuestion == null
-                        ? ''
-                        : session.questions[session.currentIndex - 1]
-                            .explanation,
-                    onNext: provider.nextQuestion,
-                  )
-                : _QuestionView(
-                    question: session.currentQuestion!,
-                    onAnswer: provider.submitAnswer,
-                  ),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 320),
+              transitionBuilder: (child, animation) {
+                final slide = Tween<Offset>(
+                  begin: const Offset(0.0, 0.06),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOut,
+                ));
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(position: slide, child: child),
+                );
+              },
+              child: provider.showingFeedback
+                  ? _FeedbackView(
+                      key: ValueKey('feedback_${session.currentIndex}'),
+                      isCorrect: provider.lastAnswerCorrect!,
+                      explanation: session.currentQuestion == null
+                          ? ''
+                          : session.questions[session.currentIndex - 1]
+                              .explanation,
+                      onNext: provider.nextQuestion,
+                    )
+                  : _QuestionView(
+                      key: ValueKey('question_${session.currentIndex}'),
+                      question: session.currentQuestion!,
+                      onAnswer: provider.submitAnswer,
+                    ),
+            ),
           ),
         ],
       ),
@@ -544,7 +562,7 @@ class _QuestionView extends StatelessWidget {
   final Question question;
   final Function(dynamic) onAnswer;
 
-  const _QuestionView({required this.question, required this.onAnswer});
+  const _QuestionView({super.key, required this.question, required this.onAnswer});
 
   @override
   Widget build(BuildContext context) {
@@ -670,7 +688,7 @@ class _QuestionAnswerWidgetState extends State<_QuestionAnswerWidget> {
   }
 }
 
-class _MultipleChoiceWidget extends StatelessWidget {
+class _MultipleChoiceWidget extends StatefulWidget {
   final List<String> options;
   final Function(dynamic) onAnswer;
 
@@ -678,32 +696,57 @@ class _MultipleChoiceWidget extends StatelessWidget {
       {required this.options, required this.onAnswer});
 
   @override
+  State<_MultipleChoiceWidget> createState() => _MultipleChoiceWidgetState();
+}
+
+class _MultipleChoiceWidgetState extends State<_MultipleChoiceWidget> {
+  int? _tapped;
+
+  void _onTap(int index) {
+    if (_tapped != null) return; // ignore taps after first selection
+    setState(() => _tapped = index);
+    Future.delayed(const Duration(milliseconds: 300), () {
+      widget.onAnswer(index);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: List.generate(
-        options.length,
-        (i) => GestureDetector(
-          onTap: () => onAnswer(i),
-          child: Container(
-            width: double.infinity,
-            margin: const EdgeInsets.only(bottom: 12),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E2F38),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF2D4A5A)),
-            ),
-            child: Text(
-              options[i],
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
+        widget.options.length,
+        (i) {
+          final isSelected = _tapped == i;
+          return GestureDetector(
+            onTap: () => _onTap(i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? const Color(0xFF58CC02).withValues(alpha: 0.2)
+                    : const Color(0xFF1E2F38),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF58CC02)
+                      : const Color(0xFF2D4A5A),
+                  width: isSelected ? 2 : 1,
+                ),
+              ),
+              child: Text(
+                widget.options[i],
+                style: TextStyle(
+                  color: isSelected ? const Color(0xFF58CC02) : Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -849,6 +892,7 @@ class _FeedbackView extends StatelessWidget {
   final VoidCallback onNext;
 
   const _FeedbackView({
+    super.key,
     required this.isCorrect,
     required this.explanation,
     required this.onNext,
