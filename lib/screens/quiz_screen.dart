@@ -316,9 +316,9 @@ class _YoutubeCard extends StatelessWidget {
 
   Future<void> _openYoutube() async {
     final encoded = Uri.encodeComponent(searchQuery);
-    // sp=EgIYBA%3D%3D filters for medium-length videos (4–20 minutes)
+    // sp=EgIYAQ%3D%3D filters for short videos (under 4 minutes)
     final uri = Uri.parse(
-      'https://www.youtube.com/results?search_query=$encoded&sp=EgIYBA%3D%3D',
+      'https://www.youtube.com/results?search_query=$encoded&sp=EgIYAQ%3D%3D',
     );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
