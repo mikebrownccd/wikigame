@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../providers/quiz_provider.dart';
 import '../core/models/question.dart';
 import 'results_screen.dart';
@@ -310,70 +310,68 @@ class _LearnView extends StatelessWidget {
   }
 }
 
-class _YoutubeCard extends StatelessWidget {
+class _YoutubeCard extends StatefulWidget {
   final String searchQuery;
   const _YoutubeCard({required this.searchQuery});
 
-  Future<void> _openYoutube() async {
-    final encoded = Uri.encodeComponent(searchQuery);
-    // sp=EgIYAQ%3D%3D filters for short videos (under 4 minutes)
-    final uri = Uri.parse(
-      'https://www.youtube.com/results?search_query=$encoded&sp=EgIYAQ%3D%3D',
-    );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  @override
+  State<_YoutubeCard> createState() => _YoutubeCardState();
+}
+
+class _YoutubeCardState extends State<_YoutubeCard> {
+  late final WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    final encoded = Uri.encodeComponent(widget.searchQuery);
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(
+        'https://www.youtube.com/embed?listType=search&list=$encoded',
+      ));
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _openYoutube,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E0000),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFFF0000).withValues(alpha: 0.4)),
-        ),
-        child: Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 22,
+              height: 22,
               decoration: const BoxDecoration(
                 color: Color(0xFFFF0000),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.play_arrow, color: Colors.white, size: 22),
+              child: const Icon(Icons.play_arrow, color: Colors.white, size: 13),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 8),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Watch a video',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    searchQuery,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              child: Text(
+                widget.searchQuery,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.open_in_new, color: Colors.white38, size: 16),
           ],
         ),
-      ),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: SizedBox(
+            height: 200,
+            child: WebViewWidget(controller: _controller),
+          ),
+        ),
+      ],
     );
   }
 }
