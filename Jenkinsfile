@@ -26,6 +26,15 @@ pipeline {
             }
         }
 
+        stage('Server Tests') {
+            steps {
+                dir('server') {
+                    sh 'dart pub get'
+                    sh 'dart test'
+                }
+            }
+        }
+
         stage('Unit Tests') {
             steps {
                 sh 'flutter test --reporter json > test-results.json || true'
